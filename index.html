@@ -12,20 +12,7 @@
 </head>
 <body>
 
-  <!-- ── Splash landing page ─────────────────────────────────────────────── -->
-  <div id="splash">
-    <div class="splash-inner">
-      <img src="Alex%20Pride.jpg" alt="Alex" class="splash-hero" />
-      <div class="splash-titles">
-        <div class="splash-tg">Troll Games</div>
-        <div class="splash-subtitle">Alex's World Cup Competition</div>
-      </div>
-      <div class="splash-enter">Enter the Tournament →</div>
-    </div>
-  </div>
-
-  <!-- ── App ────────────────────────────────────────────────────────────── -->
-  <div id="app-content" style="display:none">
+  <div id="app-content">
 
     <header class="site-header">
       <div class="header-inner">
@@ -152,16 +139,6 @@
     <script src="app.js"></script>
 
   </div><!-- /#app-content -->
-
-  <script>
-    document.getElementById('splash').addEventListener('click', function () {
-      this.classList.add('splash-fade-out');
-      setTimeout(function () {
-        document.getElementById('splash').style.display = 'none';
-        document.getElementById('app-content').style.display = '';
-      }, 380);
-    });
-  </script>
 
 </body>
 </html>
