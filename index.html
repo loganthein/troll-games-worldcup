@@ -12,129 +12,156 @@
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-title">
-        <span class="header-eyebrow">🏆 Troll Games</span>
-        <h1 class="header-main">Alex's World Cup Competition</h1>
+  <!-- ── Splash landing page ─────────────────────────────────────────────── -->
+  <div id="splash">
+    <div class="splash-inner">
+      <img src="alex-pride.jpg" alt="Alex" class="splash-hero" />
+      <div class="splash-titles">
+        <div class="splash-tg">Troll Games</div>
+        <div class="splash-subtitle">Alex's World Cup Competition</div>
       </div>
-      <div class="header-meta">
-        <span class="last-updated" id="last-updated"></span>
-      </div>
+      <div class="splash-enter">Enter the Tournament →</div>
     </div>
-    <nav class="tab-nav" role="tablist">
-      <button class="tab-btn active" data-tab="leaderboard" role="tab" aria-selected="true">🏆 Leaderboard</button>
-      <button class="tab-btn" data-tab="teams" role="tab" aria-selected="false">⚽ Teams</button>
-      <button class="tab-btn" data-tab="scores" role="tab" aria-selected="false">⚡ Live</button>
-      <button class="tab-btn" data-tab="bracket" role="tab" aria-selected="false">📊 Bracket</button>
-      <button class="tab-btn" data-tab="rules" role="tab" aria-selected="false">📖 Rules</button>
-    </nav>
-  </header>
+  </div>
 
-  <main class="site-main">
+  <!-- ── App ────────────────────────────────────────────────────────────── -->
+  <div id="app-content" style="display:none">
 
-    <div id="panel-leaderboard" class="panel">
-      <div id="leaderboard-container">
-        <p class="state-msg">Loading…</p>
-      </div>
-    </div>
-
-    <div id="panel-teams" class="panel hidden">
-      <div class="teams-filter" id="teams-filter">
-        <button class="filter-btn active" data-owner="all">All</button>
-        <button class="filter-btn" data-owner="Logan">Logan</button>
-        <button class="filter-btn" data-owner="Jazz">Jazz</button>
-        <button class="filter-btn" data-owner="Garrett">Garrett</button>
-        <button class="filter-btn" data-owner="Luke">Luke</button>
-      </div>
-      <div id="teams-container">
-        <p class="state-msg">Loading…</p>
-      </div>
-    </div>
-
-    <div id="panel-scores" class="panel hidden">
-      <div class="scores-header">
-        <span class="scores-title">Today's Matches</span>
-        <span id="scores-updated" class="scores-updated"></span>
-      </div>
-      <div id="scores-container">
-        <p class="state-msg">Loading scores…</p>
-      </div>
-    </div>
-
-    <div id="panel-bracket" class="panel hidden">
-      <div id="bracket-container">
-        <p class="state-msg">Loading…</p>
-      </div>
-    </div>
-
-    <div id="panel-rules" class="panel hidden">
-      <div class="rules-wrap">
-
-        <div class="rules-card">
-          <div class="rules-card-header">
-            <span class="rules-icon">👥</span>
-            <h2 class="rules-card-title">Players &amp; Teams</h2>
-          </div>
-          <p class="rules-body">Four players each drafted eight national teams. Points accumulate as teams advance through the tournament.</p>
-          <div class="player-roster">
-            <div class="roster-row" data-owner="Logan">
-              <span class="roster-name">Logan</span>
-              <span class="roster-teams">Spain · Germany · Belgium · Morocco · Ecuador · Ivory Coast · Austria · Czech Republic</span>
-            </div>
-            <div class="roster-row" data-owner="Jazz">
-              <span class="roster-name">Jazz</span>
-              <span class="roster-teams">France · Netherlands · Colombia · Switzerland · Uruguay · Canada · Sweden · Ghana</span>
-            </div>
-            <div class="roster-row" data-owner="Garrett">
-              <span class="roster-name">Garrett</span>
-              <span class="roster-teams">Argentina · Brazil · USA · Croatia · Senegal · South Korea · Scotland · Egypt</span>
-            </div>
-            <div class="roster-row" data-owner="Luke">
-              <span class="roster-name">Luke</span>
-              <span class="roster-teams">Portugal · England · Norway · Japan · Mexico · Turkey · Australia · Paraguay</span>
-            </div>
-          </div>
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="header-title">
+          <span class="header-eyebrow">🏆 Troll Games</span>
+          <h1 class="header-main">Alex's World Cup Competition</h1>
         </div>
-
-        <div class="rules-card">
-          <div class="rules-card-header">
-            <span class="rules-icon">⚽</span>
-            <h2 class="rules-card-title">Scoring</h2>
-          </div>
-          <p class="rules-body">Points are cumulative — a team that wins the championship earns all 31 points.</p>
-          <table class="scoring-table">
-            <thead>
-              <tr><th>Milestone</th><th>Pts</th><th>Total</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Advance from Group Stage</td><td>+1</td><td>1</td></tr>
-              <tr><td>Reach Round of 16</td><td>+2</td><td>3</td></tr>
-              <tr><td>Reach Quarterfinals</td><td>+4</td><td>7</td></tr>
-              <tr><td>Reach Semifinals</td><td>+8</td><td>15</td></tr>
-              <tr class="scoring-champion"><td>🏆 Win the Championship</td><td>+16</td><td>31</td></tr>
-            </tbody>
-          </table>
+        <div class="header-meta">
+          <span class="last-updated" id="last-updated"></span>
         </div>
-
-        <div class="rules-card">
-          <div class="rules-card-header">
-            <span class="rules-icon">⚖️</span>
-            <h2 class="rules-card-title">Tiebreaker</h2>
-          </div>
-          <p class="rules-body">Ties broken by number of teams still alive. If still tied, the player whose team advances furthest wins.</p>
-        </div>
-
       </div>
-    </div>
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-btn active" data-tab="leaderboard" role="tab" aria-selected="true">🏆 Leaderboard</button>
+        <button class="tab-btn" data-tab="teams" role="tab" aria-selected="false">⚽ Teams</button>
+        <button class="tab-btn" data-tab="scores" role="tab" aria-selected="false">⚡ Live</button>
+        <button class="tab-btn" data-tab="bracket" role="tab" aria-selected="false">📊 Bracket</button>
+        <button class="tab-btn" data-tab="rules" role="tab" aria-selected="false">📖 Rules</button>
+      </nav>
+    </header>
 
-  </main>
+    <main class="site-main">
 
-  <footer class="site-footer">
-    <span>Data via GitHub Gist · Troll Games 2026</span>
-  </footer>
+      <div id="panel-leaderboard" class="panel">
+        <div id="leaderboard-container">
+          <p class="state-msg">Loading…</p>
+        </div>
+      </div>
 
-  <script src="app.js"></script>
+      <div id="panel-teams" class="panel hidden">
+        <div class="teams-filter" id="teams-filter">
+          <button class="filter-btn active" data-owner="all">All</button>
+          <button class="filter-btn" data-owner="Logan">Logan</button>
+          <button class="filter-btn" data-owner="Jazz">Jazz</button>
+          <button class="filter-btn" data-owner="Garrett">Garrett</button>
+          <button class="filter-btn" data-owner="Luke">Luke</button>
+        </div>
+        <div id="teams-container">
+          <p class="state-msg">Loading…</p>
+        </div>
+      </div>
+
+      <div id="panel-scores" class="panel hidden">
+        <div class="scores-header">
+          <span class="scores-title">Today's Matches</span>
+          <span id="scores-updated" class="scores-updated"></span>
+        </div>
+        <div id="scores-container">
+          <p class="state-msg">Loading scores…</p>
+        </div>
+      </div>
+
+      <div id="panel-bracket" class="panel hidden">
+        <div id="bracket-container">
+          <p class="state-msg">Loading…</p>
+        </div>
+      </div>
+
+      <div id="panel-rules" class="panel hidden">
+        <div class="rules-wrap">
+
+          <div class="rules-card">
+            <div class="rules-card-header">
+              <span class="rules-icon">👥</span>
+              <h2 class="rules-card-title">Players &amp; Teams</h2>
+            </div>
+            <p class="rules-body">Four players each drafted eight national teams. Points accumulate as teams advance through the tournament.</p>
+            <div class="player-roster">
+              <div class="roster-row" data-owner="Logan">
+                <span class="roster-name">Logan</span>
+                <span class="roster-teams">Spain · Germany · Belgium · Morocco · Ecuador · Ivory Coast · Austria · Czech Republic</span>
+              </div>
+              <div class="roster-row" data-owner="Jazz">
+                <span class="roster-name">Jazz</span>
+                <span class="roster-teams">France · Netherlands · Colombia · Switzerland · Uruguay · Canada · Sweden · Ghana</span>
+              </div>
+              <div class="roster-row" data-owner="Garrett">
+                <span class="roster-name">Garrett</span>
+                <span class="roster-teams">Argentina · Brazil · USA · Croatia · Senegal · South Korea · Scotland · Egypt</span>
+              </div>
+              <div class="roster-row" data-owner="Luke">
+                <span class="roster-name">Luke</span>
+                <span class="roster-teams">Portugal · England · Norway · Japan · Mexico · Turkey · Australia · Paraguay</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rules-card">
+            <div class="rules-card-header">
+              <span class="rules-icon">⚽</span>
+              <h2 class="rules-card-title">Scoring</h2>
+            </div>
+            <p class="rules-body">Points are cumulative — a team that wins the championship earns all 31 points.</p>
+            <table class="scoring-table">
+              <thead>
+                <tr><th>Milestone</th><th>Pts</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Advance from Group Stage</td><td>+1</td><td>1</td></tr>
+                <tr><td>Reach Round of 16</td><td>+2</td><td>3</td></tr>
+                <tr><td>Reach Quarterfinals</td><td>+4</td><td>7</td></tr>
+                <tr><td>Reach Semifinals</td><td>+8</td><td>15</td></tr>
+                <tr class="scoring-champion"><td>🏆 Win the Championship</td><td>+16</td><td>31</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="rules-card">
+            <div class="rules-card-header">
+              <span class="rules-icon">⚖️</span>
+              <h2 class="rules-card-title">Tiebreaker</h2>
+            </div>
+            <p class="rules-body">Ties broken by number of teams still alive. If still tied, the player whose team advances furthest wins.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="site-footer">
+      <span>Data via GitHub Gist · Troll Games 2026</span>
+    </footer>
+
+    <script src="app.js"></script>
+
+  </div><!-- /#app-content -->
+
+  <script>
+    document.getElementById('splash').addEventListener('click', function () {
+      this.classList.add('splash-fade-out');
+      setTimeout(function () {
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('app-content').style.display = '';
+      }, 380);
+    });
+  </script>
 
 </body>
 </html>
