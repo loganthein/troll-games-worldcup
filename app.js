@@ -150,11 +150,13 @@ async function fetchGistData() {
   }
 }
 
-async function patchGist(data, pat) {
+async function patchGist(data) {
+  const pat = localStorage.getItem('tg_pat');
+  if (!pat) throw new Error('No PAT in localStorage. Run: tg.setPAT("ghp_yourtoken")');
   const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
     method: 'PATCH',
     headers: {
-      Authorization: `token ${pat}`,
+      Authorization: 'token ' + pat,
       Accept: 'application/vnd.github+json',
       'Content-Type': 'application/json',
     },
@@ -338,16 +340,13 @@ function renderApp(data) {
 const VALID_STAGES = ['group', 'r16', 'qf', 'sf', 'champion', 'eliminated'];
 
 window.tg = {
-  _pat: sessionStorage.getItem('tg_pat') || null,
-
   setPAT(token) {
-    this._pat = token;
-    sessionStorage.setItem('tg_pat', token);
+    localStorage.setItem('tg_pat', token);
     console.log('%c✓ PAT saved for this session', 'color:#10b981;font-weight:bold');
   },
 
   async updateTeam(teamName, stage) {
-    if (!this._pat) {
+    if (!localStorage.getItem('tg_pat')) {
       console.error('No PAT set. Run: tg.setPAT("ghp_yourtoken")');
       return;
     }
@@ -365,7 +364,7 @@ window.tg = {
     newData.teams[teamName].stage = stage;
     newData.lastUpdated = new Date().toISOString().slice(0, 10);
     try {
-      await patchGist(newData, this._pat);
+      await patchGist(newData);
       renderApp(newData);
       console.log(`%c✓ ${teamName}: ${prev} → ${stage} (+${STAGE_PTS[stage] ?? 0} pts)`, 'color:#10b981;font-weight:bold');
     } catch (err) {
@@ -375,7 +374,7 @@ window.tg = {
 
   async updateMany(updates) {
     // updates: [["Spain", "r16"], ["Germany", "qf"], ...]
-    if (!this._pat) { console.error('No PAT set. Run: tg.setPAT("ghp_yourtoken")'); return; }
+    if (!localStorage.getItem('tg_pat')) { console.error('No PAT set. Run: tg.setPAT("ghp_yourtoken")'); return; }
     const newData = JSON.parse(JSON.stringify(_currentData));
     for (const [teamName, stage] of updates) {
       if (!VALID_STAGES.includes(stage)) { console.warn(`Skipping "${teamName}" — invalid stage "${stage}"`); continue; }
@@ -384,7 +383,7 @@ window.tg = {
     }
     newData.lastUpdated = new Date().toISOString().slice(0, 10);
     try {
-      await patchGist(newData, this._pat);
+      await patchGist(newData);
       renderApp(newData);
       console.log(`%c✓ Updated ${updates.length} teams`, 'color:#10b981;font-weight:bold');
     } catch (err) {
@@ -401,12 +400,12 @@ window.tg = {
   },
 
   async resetAll() {
-    if (!this._pat) { console.error('No PAT set.'); return; }
+    if (!localStorage.getItem('tg_pat')) { console.error('No PAT set. Run: tg.setPAT("ghp_yourtoken")'); return; }
     if (!confirm('Reset ALL teams to group stage?')) return;
     const newData = JSON.parse(JSON.stringify(_currentData));
     for (const t of Object.values(newData.teams)) t.stage = 'group';
     newData.lastUpdated = new Date().toISOString().slice(0, 10);
-    await patchGist(newData, this._pat);
+    await patchGist(newData);
     renderApp(newData);
     console.log('%c✓ All teams reset to group stage', 'color:#f59e0b;font-weight:bold');
   },
