@@ -1,0 +1,558 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Troll Games – Alex's World Cup Competition
+   Theme: dark, bold, sports-energy
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Design tokens ──────────────────────────────────────────────────────────── */
+:root {
+  --bg-base:    #0f172a;
+  --bg-card:    #1e293b;
+  --bg-card-2:  #263548;
+  --border:     #334155;
+  --border-mid: #475569;
+
+  --text-1:     #f1f5f9;
+  --text-2:     #cbd5e1;
+  --text-3:     #94a3b8;
+
+  --font-display: 'Bebas Neue', 'Arial Narrow', sans-serif;
+  --font-mono:    'DM Mono', 'Menlo', monospace;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+
+  --shadow-card: 0 1px 4px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-lift: 0 4px 20px rgba(0,0,0,.5);
+
+  /* Player colors */
+  --logan:   #3b82f6;
+  --jazz:    #a855f7;
+  --garrett: #f43f5e;
+  --luke:    #10b981;
+
+  --logan-dim:   rgba(59,130,246,0.12);
+  --jazz-dim:    rgba(168,85,247,0.12);
+  --garrett-dim: rgba(244,63,94,0.12);
+  --luke-dim:    rgba(16,185,129,0.12);
+
+  /* Stage colors */
+  --stage-alive:     #10b981;
+  --stage-elim:      #475569;
+  --stage-champion:  #f59e0b;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-1);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--logan); text-decoration: none; }
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+.site-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,.4);
+}
+
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0.85rem 1rem 0.65rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 0.15rem;
+}
+
+.header-main {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+  color: var(--text-1);
+  line-height: 1;
+}
+
+.header-meta {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.last-updated {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+}
+
+/* ── Tabs ───────────────────────────────────────────────────────────────────── */
+.tab-nav {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 0.75rem;
+  display: flex;
+  gap: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--text-1); }
+
+.tab-btn.active {
+  color: var(--text-1);
+  border-bottom-color: #f59e0b;
+}
+
+/* ── Main ───────────────────────────────────────────────────────────────────── */
+.site-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+}
+
+.panel { }
+.panel.hidden { display: none; }
+
+.state-msg {
+  text-align: center;
+  color: var(--text-3);
+  font-size: 0.9rem;
+  padding: 3rem 0;
+}
+
+/* ── Leaderboard ────────────────────────────────────────────────────────────── */
+.lb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lb-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.lb-card:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-1px);
+}
+
+.lb-card[data-owner="Logan"]   { border-left-color: var(--logan);   background: linear-gradient(90deg, var(--logan-dim) 0%, var(--bg-card) 80px); }
+.lb-card[data-owner="Jazz"]    { border-left-color: var(--jazz);    background: linear-gradient(90deg, var(--jazz-dim) 0%, var(--bg-card) 80px); }
+.lb-card[data-owner="Garrett"] { border-left-color: var(--garrett); background: linear-gradient(90deg, var(--garrett-dim) 0%, var(--bg-card) 80px); }
+.lb-card[data-owner="Luke"]    { border-left-color: var(--luke);    background: linear-gradient(90deg, var(--luke-dim) 0%, var(--bg-card) 80px); }
+
+.lb-card-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.lb-rank {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--text-3);
+  min-width: 2rem;
+  text-align: center;
+}
+
+.lb-rank-1 { color: #f59e0b; }
+.lb-rank-2 { color: #cbd5e1; }
+.lb-rank-3 { color: #b87333; }
+
+.lb-player-info { flex: 1; }
+
+.lb-player-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.lb-card[data-owner="Logan"]   .lb-player-name { color: var(--logan); }
+.lb-card[data-owner="Jazz"]    .lb-player-name { color: var(--jazz); }
+.lb-card[data-owner="Garrett"] .lb-player-name { color: var(--garrett); }
+.lb-card[data-owner="Luke"]    .lb-player-name { color: var(--luke); }
+
+.lb-alive-count {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  margin-top: 0.15rem;
+}
+
+.lb-score {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--text-1);
+  text-align: right;
+}
+
+.lb-score-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: right;
+  display: block;
+}
+
+.lb-teams-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.lb-team-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.2em 0.55em;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card-2);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.lb-team-chip.is-alive {
+  border-color: rgba(16,185,129,0.35);
+  background: rgba(16,185,129,0.08);
+  color: var(--text-1);
+}
+
+.lb-team-chip.is-champion {
+  border-color: rgba(245,158,11,0.5);
+  background: rgba(245,158,11,0.1);
+  color: #fbbf24;
+}
+
+.lb-team-chip.is-eliminated {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.chip-stage {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  opacity: 0.7;
+}
+
+.chip-flag {
+  width: 14px;
+  height: auto;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* ── Teams grid ─────────────────────────────────────────────────────────────── */
+.teams-filter {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.filter-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.3em 0.85em;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover { color: var(--text-1); border-color: var(--border-mid); }
+.filter-btn.active { color: var(--text-1); background: var(--bg-card-2); border-color: var(--border-mid); }
+.filter-btn[data-owner="Logan"].active   { border-color: var(--logan);   color: var(--logan); }
+.filter-btn[data-owner="Jazz"].active    { border-color: var(--jazz);    color: var(--jazz); }
+.filter-btn[data-owner="Garrett"].active { border-color: var(--garrett); color: var(--garrett); }
+.filter-btn[data-owner="Luke"].active    { border-color: var(--luke);    color: var(--luke); }
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.65rem;
+}
+
+.team-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 0.75rem 0.85rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s, transform 0.15s, opacity 0.2s;
+}
+
+.team-card:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+}
+
+.team-card.is-filtered-out {
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.team-card[data-owner="Logan"]   { border-top-color: var(--logan); }
+.team-card[data-owner="Jazz"]    { border-top-color: var(--jazz); }
+.team-card[data-owner="Garrett"] { border-top-color: var(--garrett); }
+.team-card[data-owner="Luke"]    { border-top-color: var(--luke); }
+
+.team-card.is-eliminated { opacity: 0.45; }
+.team-card.is-champion   { border-top-color: #f59e0b; box-shadow: 0 0 0 1px rgba(245,158,11,0.25), var(--shadow-card); }
+
+.tc-flag-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tc-flag {
+  width: 28px;
+  height: auto;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.tc-name {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.2;
+}
+
+.tc-owner {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.tc-owner[data-owner="Logan"]   { color: var(--logan); }
+.tc-owner[data-owner="Jazz"]    { color: var(--jazz); }
+.tc-owner[data-owner="Garrett"] { color: var(--garrett); }
+.tc-owner[data-owner="Luke"]    { color: var(--luke); }
+
+.tc-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.tc-stage-badge {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.18em 0.5em;
+  border-radius: var(--r-sm);
+  background: var(--bg-card-2);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+.tc-stage-badge.alive    { background: rgba(16,185,129,0.12); color: #34d399; border-color: rgba(16,185,129,0.3); }
+.tc-stage-badge.champion { background: rgba(245,158,11,0.15); color: #fbbf24; border-color: rgba(245,158,11,0.4); }
+.tc-stage-badge.elim     { background: transparent; color: var(--text-3); border-color: var(--border); }
+
+.tc-pts {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--text-1);
+}
+
+.tc-pts-zero { color: var(--text-3); }
+
+/* ── Rules ──────────────────────────────────────────────────────────────────── */
+.rules-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.rules-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.rules-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.rules-icon { font-size: 1.1rem; }
+
+.rules-card-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--text-1);
+}
+
+.rules-body {
+  font-size: 0.85rem;
+  color: var(--text-2);
+  margin-bottom: 0.85rem;
+  line-height: 1.6;
+}
+
+.player-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roster-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: 0.8rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.roster-row:last-child { border-bottom: none; }
+
+.roster-name {
+  font-weight: 700;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+.roster-row[data-owner="Logan"]   .roster-name { color: var(--logan); }
+.roster-row[data-owner="Jazz"]    .roster-name { color: var(--jazz); }
+.roster-row[data-owner="Garrett"] .roster-name { color: var(--garrett); }
+.roster-row[data-owner="Luke"]    .roster-name { color: var(--luke); }
+
+.roster-teams { color: var(--text-2); line-height: 1.5; }
+
+.scoring-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 0.5rem;
+}
+
+.scoring-table th {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.scoring-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+}
+
+.scoring-table td:nth-child(2),
+.scoring-table td:nth-child(3) {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+.scoring-champion td {
+  color: #fbbf24;
+  background: rgba(245,158,11,0.07);
+  font-weight: 600;
+}
+
+.scoring-table tr:last-child td { border-bottom: none; }
+
+/* ── Footer ─────────────────────────────────────────────────────────────────── */
+.site-footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Mobile ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .header-main { font-size: 1.25rem; }
+  .lb-score { font-size: 2.4rem; }
+  .lb-rank { font-size: 1.8rem; }
+  .teams-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .tab-btn { padding: 0.5rem 0.6rem; font-size: 0.72rem; }
+}
+
+@media (min-width: 600px) {
+  .rules-wrap { grid-template-columns: 1fr 1fr; }
+}
