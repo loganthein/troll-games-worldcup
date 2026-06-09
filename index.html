@@ -25,6 +25,8 @@
     <nav class="tab-nav" role="tablist">
       <button class="tab-btn active" data-tab="leaderboard" role="tab" aria-selected="true">🏆 Leaderboard</button>
       <button class="tab-btn" data-tab="teams" role="tab" aria-selected="false">⚽ Teams</button>
+      <button class="tab-btn" data-tab="scores" role="tab" aria-selected="false">⚡ Live</button>
+      <button class="tab-btn" data-tab="bracket" role="tab" aria-selected="false">📊 Bracket</button>
       <button class="tab-btn" data-tab="rules" role="tab" aria-selected="false">📖 Rules</button>
     </nav>
   </header>
@@ -46,6 +48,22 @@
         <button class="filter-btn" data-owner="Luke">Luke</button>
       </div>
       <div id="teams-container">
+        <p class="state-msg">Loading…</p>
+      </div>
+    </div>
+
+    <div id="panel-scores" class="panel hidden">
+      <div class="scores-header">
+        <span class="scores-title">Today's Matches</span>
+        <span id="scores-updated" class="scores-updated"></span>
+      </div>
+      <div id="scores-container">
+        <p class="state-msg">Loading scores…</p>
+      </div>
+    </div>
+
+    <div id="panel-bracket" class="panel hidden">
+      <div id="bracket-container">
         <p class="state-msg">Loading…</p>
       </div>
     </div>

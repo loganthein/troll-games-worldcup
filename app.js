@@ -328,6 +328,7 @@ function renderApp(data) {
 
   renderLeaderboard(data);
   renderTeams(data);
+  renderBracket(data);
 
   const el = document.getElementById('last-updated');
   if (el && data.lastUpdated) {
@@ -411,24 +412,209 @@ window.tg = {
   },
 };
 
+// ── ESPN Live Scores ────────────────────────────────────────────────────────────
+
+const ESPN_SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+
+// ESPN display name → canonical team name (add as needed)
+const ESPN_NAME_MAP = {
+  'United States':      'USA',
+  "Côte d'Ivoire":      'Ivory Coast',
+  'Korea Republic':     'South Korea',
+  'Republic of Korea':  'South Korea',
+  'Czechia':            'Czech Republic',
+};
+
+function espnCanonical(name) {
+  return ESPN_NAME_MAP[name] || name;
+}
+
+function teamOwnerFromData(espnName, teamsData) {
+  if (!teamsData) return null;
+  const canonical = espnCanonical(espnName);
+  return teamsData[canonical]?.owner || null;
+}
+
+async function fetchLiveScores() {
+  try {
+    const res = await fetch(ESPN_SCOREBOARD, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`ESPN ${res.status}`);
+    const json = await res.json();
+    return json.events || [];
+  } catch (err) {
+    console.warn('[TrollGames] ESPN unavailable:', err.message);
+    return null;
+  }
+}
+
+function buildMatchCard(event, teamsData) {
+  const comp = event.competitions?.[0];
+  if (!comp) return '';
+
+  const home = comp.competitors?.find(c => c.homeAway === 'home') || {};
+  const away = comp.competitors?.find(c => c.homeAway === 'away') || {};
+  const homeName  = home.team?.displayName || '';
+  const awayName  = away.team?.displayName || '';
+  const homeScore = home.score ?? '';
+  const awayScore = away.score ?? '';
+  const homeOwner = teamOwnerFromData(homeName, teamsData);
+  const awayOwner = teamOwnerFromData(awayName, teamsData);
+
+  const state = event.status?.type?.state; // 'pre' | 'in' | 'post'
+  const clock = comp.status?.displayClock || '';
+
+  // Center section: score+status or kick-off time
+  let centerHtml, cardCls;
+  if (state === 'pre') {
+    const d = new Date(comp.date || event.date || '');
+    const time = isNaN(d) ? 'TBD' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    centerHtml = `<span class="match-status is-upcoming">${time}</span>`;
+    cardCls = 'is-upcoming';
+  } else {
+    const label  = state === 'in' ? (clock || 'LIVE') : 'FT';
+    const sCls   = state === 'in' ? 'is-live' : 'is-final';
+    centerHtml   = `<span class="match-score-num">${homeScore}</span><span class="match-status ${sCls}">${label}</span><span class="match-score-num">${awayScore}</span>`;
+    cardCls      = sCls;
+  }
+
+  const homeOwnerHtml = homeOwner ? `<span class="match-owner-badge" data-owner="${homeOwner}">${homeOwner}</span>` : '';
+  const awayOwnerHtml = awayOwner ? `<span class="match-owner-badge" data-owner="${awayOwner}">${awayOwner}</span>` : '';
+
+  return `
+    <div class="match-card ${cardCls}">
+      <div class="match-teams">
+        <div class="match-team match-home${homeOwner ? ' is-owned' : ''}">
+          ${flagImg(espnCanonical(homeName), 16)}
+          <span class="match-team-name">${homeName}</span>
+          ${homeOwnerHtml}
+        </div>
+        <div class="match-center">${centerHtml}</div>
+        <div class="match-team match-away${awayOwner ? ' is-owned' : ''}">
+          ${awayOwnerHtml}
+          <span class="match-team-name">${awayName}</span>
+          ${flagImg(espnCanonical(awayName), 16)}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderLiveScores(events, teamsData) {
+  const container = document.getElementById('scores-container');
+  if (!container) return;
+
+  if (events === null) {
+    container.innerHTML = '<p class="state-msg">Could not load scores. Check back later.</p>';
+    return;
+  }
+  if (events.length === 0) {
+    container.innerHTML = '<p class="state-msg">No matches scheduled today.</p>';
+    return;
+  }
+
+  // Sort: live first, then upcoming, then completed
+  const order = { in: 0, pre: 1, post: 2 };
+  const sorted = [...events].sort((a, b) =>
+    (order[a.status?.type?.state] ?? 3) - (order[b.status?.type?.state] ?? 3)
+  );
+
+  const html = sorted.map(e => buildMatchCard(e, teamsData)).join('');
+  container.innerHTML = `<div class="matches-list">${html}</div>`;
+
+  const upd = document.getElementById('scores-updated');
+  if (upd) upd.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+// ── Bracket ────────────────────────────────────────────────────────────────────
+
+const BRACKET_ROUNDS = [
+  { key: 'champion',   label: '🏆 Champion',   cls: 'round-champion' },
+  { key: 'sf',         label: 'Semifinals',     cls: 'round-sf'      },
+  { key: 'qf',         label: 'Quarterfinals',  cls: 'round-qf'      },
+  { key: 'r16',        label: 'Round of 16',    cls: 'round-r16'     },
+  { key: 'group',      label: 'Group Stage',    cls: 'round-group'   },
+  { key: 'eliminated', label: 'Eliminated',     cls: 'round-elim'    },
+];
+
+function renderBracket(data) {
+  const container = document.getElementById('bracket-container');
+  if (!container) return;
+
+  const byStage = {};
+  for (const r of BRACKET_ROUNDS) byStage[r.key] = [];
+  for (const [teamName, t] of Object.entries(data.teams)) {
+    if (byStage[t.stage]) byStage[t.stage].push({ teamName, owner: t.owner });
+  }
+
+  const sections = BRACKET_ROUNDS
+    .filter(r => byStage[r.key].length > 0)
+    .map(r => {
+      const teams = byStage[r.key].sort((a, b) => a.teamName.localeCompare(b.teamName));
+      const chips = teams.map(({ teamName, owner }) => `
+        <span class="br-chip">
+          ${flagImg(teamName, 14)}
+          <span class="br-name">${teamName}</span>
+          <span class="br-owner" data-owner="${owner}">${owner}</span>
+        </span>`).join('');
+      return `
+        <div class="br-round ${r.cls}">
+          <div class="br-round-label">${r.label}</div>
+          <div class="br-chips">${chips}</div>
+        </div>`;
+    }).join('');
+
+  container.innerHTML = `<div class="bracket-wrap">${sections}</div>`;
+}
+
+// ── Live scores tab wiring ──────────────────────────────────────────────────────
+
+let _scoresLoaded = false;
+let _scoresInterval = null;
+
+async function refreshLiveScores() {
+  _scoresLoaded = true;
+  const events = await fetchLiveScores();
+  renderLiveScores(events, _currentData?.teams || null);
+  // Auto-refresh faster if any match is live
+  const hasLive = events && events.some(e => e.status?.type?.state === 'in');
+  clearInterval(_scoresInterval);
+  _scoresInterval = setInterval(refreshLiveScores, hasLive ? 30000 : 60000);
+}
+
+function initLiveScoresTab() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.tab === 'scores') {
+        if (!_scoresLoaded) refreshLiveScores();
+        else if (!_scoresInterval) {
+          _scoresInterval = setInterval(refreshLiveScores, 60000);
+        }
+      } else {
+        clearInterval(_scoresInterval);
+        _scoresInterval = null;
+      }
+    });
+  });
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────────
 
 (async function init() {
   initTabs();
   initTeamsFilter();
+  initLiveScoresTab();
 
   const data = await fetchGistData();
   renderApp(data);
 
   // Console instructions
-  console.log('%c🏆 Troll Games – Admin Console', 'font-size:14px;font-weight:bold;color:#f59e0b');
-  console.log('%cSet your PAT once per session:', 'color:#94a3b8');
+  console.log('%c🏆 Troll Games – Admin Console', 'font-size:14px;font-weight:bold;color:#c8102e');
+  console.log('%cSet your PAT once per session:', 'color:#6b7280');
   console.log('  tg.setPAT("ghp_yourtoken")');
-  console.log('%cUpdate a single team:', 'color:#94a3b8');
+  console.log('%cUpdate a single team:', 'color:#6b7280');
   console.log('  tg.updateTeam("Spain", "r16")');
-  console.log('%cUpdate multiple teams at once:', 'color:#94a3b8');
+  console.log('%cUpdate multiple teams at once:', 'color:#6b7280');
   console.log('  tg.updateMany([["Spain","r16"], ["Germany","qf"]])');
-  console.log('%cView current state:', 'color:#94a3b8');
+  console.log('%cView current state:', 'color:#6b7280');
   console.log('  tg.showData()');
-  console.log('%cValid stages: group | r16 | qf | sf | champion | eliminated', 'color:#64748b');
+  console.log('%cValid stages: group | r16 | qf | sf | champion | eliminated', 'color:#9ca3af');
 })();
