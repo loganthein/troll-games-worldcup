@@ -29,9 +29,34 @@ Live leaderboard for Alex's 4-player World Cup draft competition. Each player ow
 
 ---
 
+## Automatic Score Updates
+
+From the Round of 32 onward, scores update themselves. A GitHub Actions workflow
+(`.github/workflows/update-scores.yml`) runs every 15 minutes, checks ESPN for
+newly-finished World Cup matches, and bumps any drafted team that won one round
+forward (`r32` → `r16` → `qf` → `sf` → `champion`).
+
+Losers are left alone — their stage already reflects the furthest round they
+reached, which is what their points are based on. Don't set a knockout loser to
+`"eliminated"`; that stage is reserved for teams that never got out of the group
+stage, and flipping a knockout loser to it would zero out points they already
+earned (`STAGE_PTS.eliminated` is 0).
+
+**One-time setup:** add a repository secret named `GIST_PAT` (Settings →
+Secrets and variables → Actions → New repository secret) containing a personal
+access token with `gist` scope — the same kind of token used below for manual
+updates.
+
+You can trigger a run manually from the Actions tab (`Update World Cup Scores`
+→ Run workflow) instead of waiting for the schedule.
+
+---
+
 ## Updating Scores (Admin Console)
 
-All updates are made via the browser console at the live site. No server required.
+The console is the manual fallback — useful for the group stage (already
+complete) or for correcting a mistake. Knockout-round results are now handled
+automatically (see above). No server required either way.
 
 ### Step 1 — Set your PAT (once per browser session)
 
