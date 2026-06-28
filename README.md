@@ -62,6 +62,7 @@ tg.updateMany([
 | Stage | Meaning | Points |
 |---|---|---|
 | `"group"` | Group stage (not yet advanced) | 0 |
+| `"r32"` | Advanced from group stage (Round of 32) | 1 |
 | `"r16"` | Reached Round of 16 | 3 |
 | `"qf"` | Reached Quarterfinals | 7 |
 | `"sf"` | Reached Semifinals | 15 |

@@ -12,7 +12,7 @@
  *   tg.showData()                    — print current state to console
  *   tg.resetAll()                    — set all teams back to "group"
  *
- * Valid stages: "group" | "r16" | "qf" | "sf" | "champion" | "eliminated"
+ * Valid stages: "group" | "r32" | "r16" | "qf" | "sf" | "champion" | "eliminated"
  */
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -24,7 +24,8 @@ const GIST_FILENAME = 'troll-games-data.json';
 const STAGE_PTS = {
   group:      0,
   eliminated: 0,
-  r16:        3,   // +1 advance + +2 reach R16
+  r32:        1,   // +1 advance from group stage
+  r16:        3,   // +2 reach R16
   qf:         7,   // +4 reach QF
   sf:         15,  // +8 reach SF
   champion:   31,  // +16 win championship
@@ -33,6 +34,7 @@ const STAGE_PTS = {
 const STAGE_LABELS = {
   group:      'Group Stage',
   eliminated: 'Eliminated',
+  r32:        'Round of 32',
   r16:        'Round of 16',
   qf:         'Quarterfinals',
   sf:         'Semifinals',
@@ -338,7 +340,7 @@ function renderApp(data) {
 
 // ── Admin console API ──────────────────────────────────────────────────────────
 
-const VALID_STAGES = ['group', 'r16', 'qf', 'sf', 'champion', 'eliminated'];
+const VALID_STAGES = ['group', 'r32', 'r16', 'qf', 'sf', 'champion', 'eliminated'];
 
 window.tg = {
   setPAT(token) {
@@ -531,6 +533,7 @@ const BRACKET_ROUNDS = [
   { key: 'sf',         label: 'Semifinals',     cls: 'round-sf'      },
   { key: 'qf',         label: 'Quarterfinals',  cls: 'round-qf'      },
   { key: 'r16',        label: 'Round of 16',    cls: 'round-r16'     },
+  { key: 'r32',        label: 'Round of 32',    cls: 'round-r32'     },
   { key: 'group',      label: 'Group Stage',    cls: 'round-group'   },
   { key: 'eliminated', label: 'Eliminated',     cls: 'round-elim'    },
 ];
@@ -616,5 +619,5 @@ function initLiveScoresTab() {
   console.log('  tg.updateMany([["Spain","r16"], ["Germany","qf"]])');
   console.log('%cView current state:', 'color:#6b7280');
   console.log('  tg.showData()');
-  console.log('%cValid stages: group | r16 | qf | sf | champion | eliminated', 'color:#9ca3af');
+  console.log('%cValid stages: group | r32 | r16 | qf | sf | champion | eliminated', 'color:#9ca3af');
 })();
