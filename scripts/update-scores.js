@@ -2,8 +2,9 @@
  * update-scores.js — Auto-advance teams in the Gist based on real match results.
  *
  * Runs on a GitHub Actions schedule (see .github/workflows/update-scores.yml).
- * Pulls finished World Cup matches from ESPN, and for any drafted team that
- * won, bumps their stage one round forward (r32 -> r16 -> qf -> sf -> champion).
+ * Pulls finished knockout-round matches from ESPN (group stage matches are
+ * skipped), and for any drafted team that won, bumps their stage one step
+ * forward (r32 -> r16 -> qf -> sf -> champion).
  *
  * Losers are left untouched — their stage already reflects the furthest
  * milestone they reached, and that's what their points are based on. Setting
@@ -31,7 +32,13 @@ const ESPN_NAME_MAP = {
   'Czechia':            'Czech Republic',
 };
 
-const NEXT_STAGE = { group: 'r32', r32: 'r16', r16: 'qf', qf: 'sf', sf: 'champion' };
+// Only advance from knockout-round stages (never from group stage wins)
+const NEXT_STAGE = { r32: 'r16', r16: 'qf', qf: 'sf', sf: 'champion' };
+
+// ESPN group stage events have a competition note with value "Group A", "Group B", etc.
+function isGroupStageMatch(comp) {
+  return (comp.notes || []).some(n => n.type === 'event' && /^group\s/i.test(n.value || ''));
+}
 
 function espnCanonical(name) {
   return ESPN_NAME_MAP[name] || name;
@@ -103,6 +110,12 @@ async function main() {
     const comp = event.competitions?.[0];
     const competitors = comp?.competitors || [];
     if (competitors.length !== 2) continue;
+
+    if (isGroupStageMatch(comp)) {
+      processed.add(event.id); // mark seen; never advance teams on group stage results
+      dirty = true;
+      continue;
+    }
 
     const winnerIdx = matchWinnerIndex(competitors);
     if (winnerIdx === -1) continue; // result not final/clear yet — retry next run
