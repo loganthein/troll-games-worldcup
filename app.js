@@ -180,7 +180,7 @@ function calcPlayerScore(playerName, teams) {
   for (const [, t] of Object.entries(teams)) {
     if (t.owner !== playerName) continue;
     total += STAGE_PTS[t.stage] ?? 0;
-    if (t.stage !== 'eliminated') alive++;
+    if (t.stage !== 'eliminated' && !t.knockedOut) alive++;
   }
   return { total, alive };
 }
@@ -222,12 +222,13 @@ function renderLeaderboard(data) {
       .sort(([, a], [, b]) => (STAGE_PTS[b.stage] ?? 0) - (STAGE_PTS[a.stage] ?? 0));
 
     const chips = playerTeams.map(([teamName, t]) => {
+      const isOut = t.stage === 'eliminated' || t.knockedOut;
       const cls = t.stage === 'champion' ? 'is-champion'
-                : t.stage === 'eliminated' ? 'is-eliminated'
+                : isOut ? 'is-eliminated'
                 : t.stage !== 'group' ? 'is-alive'
                 : '';
       const stageShort = t.stage === 'champion' ? '🏆'
-                       : t.stage === 'eliminated' ? 'out'
+                       : isOut ? 'out'
                        : t.stage === 'group' ? ''
                        : t.stage.toUpperCase();
       const pts = STAGE_PTS[t.stage] ?? 0;
@@ -268,7 +269,7 @@ function renderTeams(data) {
   const cards = Object.entries(data.teams).map(([teamName, t]) => {
     const pts      = STAGE_PTS[t.stage] ?? 0;
     const sCls     = stageClass(t.stage);
-    const cardCls  = t.stage === 'eliminated' ? 'is-eliminated'
+    const cardCls  = (t.stage === 'eliminated' || t.knockedOut) ? 'is-eliminated'
                    : t.stage === 'champion'   ? 'is-champion'
                    : '';
     const filterCls = (_activeFilter !== 'all' && _activeFilter !== t.owner) ? 'is-filtered-out' : '';
@@ -394,10 +395,27 @@ window.tg = {
     }
   },
 
+  async knockOut(teamName) {
+    // Mark a team as knocked out (greyed out) while preserving their earned points.
+    // Use this for teams eliminated in knockout rounds (not group stage eliminations).
+    if (!localStorage.getItem('tg_pat')) { console.error('No PAT set. Run: tg.setPAT("ghp_yourtoken")'); return; }
+    if (!_currentData.teams[teamName]) { console.error(`Unknown team "${teamName}"`); return; }
+    const newData = JSON.parse(JSON.stringify(_currentData));
+    newData.teams[teamName].knockedOut = true;
+    newData.lastUpdated = new Date().toISOString().slice(0, 10);
+    try {
+      await patchGist(newData);
+      renderApp(newData);
+      console.log(`%c✓ ${teamName} marked as knocked out (${STAGE_PTS[newData.teams[teamName].stage]} pts kept)`, 'color:#10b981;font-weight:bold');
+    } catch (err) {
+      console.error('Update failed:', err.message);
+    }
+  },
+
   showData() {
     console.table(
       Object.entries(_currentData.teams).map(([team, t]) => ({
-        Team: team, Owner: t.owner, Stage: t.stage, Pts: STAGE_PTS[t.stage] ?? 0,
+        Team: team, Owner: t.owner, Stage: t.stage, KnockedOut: t.knockedOut ?? false, Pts: STAGE_PTS[t.stage] ?? 0,
       }))
     );
   },

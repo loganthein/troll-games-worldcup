@@ -121,6 +121,8 @@ async function main() {
     if (winnerIdx === -1) continue; // result not final/clear yet — retry next run
 
     const winnerName = espnCanonical(competitors[winnerIdx].team?.displayName || '');
+    const loserName  = espnCanonical(competitors[1 - winnerIdx].team?.displayName || '');
+
     const winnerTeam = data.teams[winnerName];
     if (winnerTeam) {
       const next = NEXT_STAGE[winnerTeam.stage];
@@ -129,6 +131,13 @@ async function main() {
         log.push(`${winnerName}: -> ${next}`);
         dirty = true;
       }
+    }
+
+    const loserTeam = data.teams[loserName];
+    if (loserTeam && !loserTeam.knockedOut) {
+      loserTeam.knockedOut = true;
+      log.push(`${loserName}: knocked out`);
+      dirty = true;
     }
 
     processed.add(event.id);
