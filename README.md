@@ -8,13 +8,13 @@ Live leaderboard for Alex's 4-player World Cup draft competition. Each player ow
 
 ## Scoring
 
-| Milestone | Pts | Cumulative |
-|---|---|---|
-| Advance from Group Stage | +1 | 1 |
-| Reach Round of 16 | +2 | 3 |
-| Reach Quarterfinals | +4 | 7 |
-| Reach Semifinals | +8 | 15 |
-| Win the Championship | +16 | 31 |
+| Milestone | Pts |
+|---|---|
+| Advance from Group Stage (Round of 32) | 1 |
+| Reach Round of 16 | 2 |
+| Reach Quarterfinals | 4 |
+| Reach Semifinals | 8 |
+| Win the Championship | 16 |
 
 ---
 
@@ -88,10 +88,10 @@ tg.updateMany([
 |---|---|---|
 | `"group"` | Group stage (not yet advanced) | 0 |
 | `"r32"` | Advanced from group stage (Round of 32) | 1 |
-| `"r16"` | Reached Round of 16 | 3 |
-| `"qf"` | Reached Quarterfinals | 7 |
-| `"sf"` | Reached Semifinals | 15 |
-| `"champion"` | Won the championship | 31 |
+| `"r16"` | Reached Round of 16 | 2 |
+| `"qf"` | Reached Quarterfinals | 4 |
+| `"sf"` | Reached Semifinals | 8 |
+| `"champion"` | Won the championship | 16 |
 | `"eliminated"` | Eliminated | 0 |
 
 ### Other helpers

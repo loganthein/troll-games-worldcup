@@ -20,15 +20,15 @@
 const GIST_ID       = '6c8e7f60b0148c6b41c2b9510f791578';
 const GIST_FILENAME = 'troll-games-data.json';
 
-// Points earned at each stage (cumulative)
+// Points earned at each stage
 const STAGE_PTS = {
   group:      0,
   eliminated: 0,
-  r32:        1,   // +1 advance from group stage
-  r16:        3,   // +2 reach R16
-  qf:         7,   // +4 reach QF
-  sf:         15,  // +8 reach SF
-  champion:   31,  // +16 win championship
+  r32:        1,   // advance from group stage
+  r16:        2,   // reach Round of 16
+  qf:         4,   // reach Quarterfinals
+  sf:         8,   // reach Semifinals
+  champion:   16,  // win Championship
 };
 
 const STAGE_LABELS = {
